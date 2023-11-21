@@ -31,6 +31,8 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "nowinandroid"
+
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 include(":app")
 include(":app-nia-catalog")
 include(":benchmarks")
@@ -39,6 +41,7 @@ include(":core:data")
 include(":core:data-test")
 include(":core:database")
 include(":core:datastore")
+include(":core:datastore-proto")
 include(":core:datastore-test")
 include(":core:designsystem")
 include(":core:domain")
@@ -47,11 +50,13 @@ include(":core:network")
 include(":core:ui")
 include(":core:testing")
 include(":core:analytics")
+include(":core:notifications")
 
 include(":feature:foryou")
 include(":feature:interests")
 include(":feature:bookmarks")
 include(":feature:topic")
+include(":feature:search")
 include(":feature:settings")
 include(":lint")
 include(":sync:work")

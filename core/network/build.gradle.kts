@@ -15,9 +15,9 @@
  */
 
 plugins {
-    id("nowinandroid.android.library")
-    id("nowinandroid.android.library.jacoco")
-    id("nowinandroid.android.hilt")
+    alias(libs.plugins.nowinandroid.android.library)
+    alias(libs.plugins.nowinandroid.android.library.jacoco)
+    alias(libs.plugins.nowinandroid.android.hilt)
     id("kotlinx-serialization")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
@@ -39,19 +39,16 @@ secrets {
 }
 
 dependencies {
-    implementation(project(":core:common"))
-    implementation(project(":core:model"))
-
-    testImplementation(project(":core:testing"))
-
+    implementation(projects.core.common)
+    implementation(projects.core.model)
+    implementation(libs.coil.kt)
+    implementation(libs.coil.kt.svg)
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.datetime)
-
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.okhttp.logging)
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.kotlin.serialization)
 
-    implementation(libs.coil.kt)
-    implementation(libs.coil.kt.svg)
+    testImplementation(projects.core.testing)
 }

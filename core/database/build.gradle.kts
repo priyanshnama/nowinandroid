@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-// TODO: Remove once https://youtrack.jetbrains.com/issue/KTIJ-19369 is fixed
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("nowinandroid.android.library")
-    id("nowinandroid.android.library.jacoco")
-    id("nowinandroid.android.hilt")
-    id("nowinandroid.android.room")
+    alias(libs.plugins.nowinandroid.android.library)
+    alias(libs.plugins.nowinandroid.android.library.jacoco)
+    alias(libs.plugins.nowinandroid.android.hilt)
+    alias(libs.plugins.nowinandroid.android.room)
 }
 
 android {
@@ -32,10 +30,10 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:model"))
+    implementation(projects.core.model)
 
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.datetime)
 
-    androidTestImplementation(project(":core:testing"))
+    androidTestImplementation(projects.core.testing)
 }

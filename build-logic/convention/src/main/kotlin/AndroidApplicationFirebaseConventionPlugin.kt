@@ -14,14 +14,13 @@
  *   limitations under the License.
  */
 
-import com.android.build.api.variant.ApplicationAndroidComponentsExtension
+import com.android.build.api.dsl.ApplicationExtension
 import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
+import com.google.samples.apps.nowinandroid.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.getByType
 
 class AndroidApplicationFirebaseConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -32,7 +31,6 @@ class AndroidApplicationFirebaseConventionPlugin : Plugin<Project> {
                 apply("com.google.firebase.crashlytics")
             }
 
-            val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
             dependencies {
                 val bom = libs.findLibrary("firebase-bom").get()
                 add("implementation", platform(bom))
@@ -41,15 +39,13 @@ class AndroidApplicationFirebaseConventionPlugin : Plugin<Project> {
                 "implementation"(libs.findLibrary("firebase.crashlytics").get())
             }
 
-            extensions.configure<ApplicationAndroidComponentsExtension> {
-                finalizeDsl {
-                    it.buildTypes.forEach { buildType ->
-                        // Disable the Crashlytics mapping file upload. This feature should only be
-                        // enabled if a Firebase backend is available and configured in
-                        // google-services.json.
-                        buildType.configure<CrashlyticsExtension> {
-                            mappingFileUploadEnabled = false
-                        }
+            extensions.configure<ApplicationExtension> {
+                buildTypes.configureEach {
+                    // Disable the Crashlytics mapping file upload. This feature should only be
+                    // enabled if a Firebase backend is available and configured in
+                    // google-services.json.
+                    configure<CrashlyticsExtension> {
+                        mappingFileUploadEnabled = false
                     }
                 }
             }

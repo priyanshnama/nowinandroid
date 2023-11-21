@@ -16,20 +16,22 @@
 import com.google.samples.apps.nowinandroid.NiaBuildType
 
 plugins {
-    id("nowinandroid.android.application")
-    id("nowinandroid.android.application.compose")
-    id("nowinandroid.android.application.flavors")
-    id("nowinandroid.android.application.jacoco")
-    id("nowinandroid.android.hilt")
+    alias(libs.plugins.nowinandroid.android.application)
+    alias(libs.plugins.nowinandroid.android.application.compose)
+    alias(libs.plugins.nowinandroid.android.application.flavors)
+    alias(libs.plugins.nowinandroid.android.application.jacoco)
+    alias(libs.plugins.nowinandroid.android.hilt)
     id("jacoco")
-    id("nowinandroid.android.application.firebase")
+    alias(libs.plugins.nowinandroid.android.application.firebase)
+    id("com.google.android.gms.oss-licenses-plugin")
+    alias(libs.plugins.baselineprofile)
 }
 
 android {
     defaultConfig {
         applicationId = "com.google.samples.apps.nowinandroid"
-        versionCode = 5
-        versionName = "0.0.5" // X.Y.Z; X = Major, Y = minor, Z = Patch level
+        versionCode = 8
+        versionName = "0.1.2" // X.Y.Z; X = Major, Y = minor, Z = Patch level
 
         // Custom test runner to set up Hilt dependency graph
         testInstrumentationRunner = "com.google.samples.apps.nowinandroid.core.testing.NiaTestRunner"
@@ -39,10 +41,10 @@ android {
     }
 
     buildTypes {
-        val debug by getting {
+        debug {
             applicationIdSuffix = NiaBuildType.DEBUG.applicationIdSuffix
         }
-        val release by getting {
+        val release = getByName("release") {
             isMinifyEnabled = true
             applicationIdSuffix = NiaBuildType.RELEASE.applicationIdSuffix
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -51,8 +53,10 @@ android {
             // who clones the code to sign and run the release variant, use the debug signing key.
             // TODO: Abstract the signing configuration to a separate file to avoid hardcoding this.
             signingConfig = signingConfigs.getByName("debug")
+            // Ensure Baseline Profile is fresh for release builds.
+            baselineProfile.automaticGenerationDuringBuild = true
         }
-        val benchmark by creating {
+        create("benchmark") {
             // Enable all the optimizations from release build through initWith(release).
             initWith(release)
             matchingFallbacks.add("release")
@@ -65,7 +69,7 @@ android {
         }
     }
 
-    packagingOptions {
+    packaging {
         resources {
             excludes.add("/META-INF/{AL2.0,LGPL2.1}")
         }
@@ -79,32 +83,32 @@ android {
 }
 
 dependencies {
-    implementation(project(":feature:interests"))
-    implementation(project(":feature:foryou"))
-    implementation(project(":feature:bookmarks"))
-    implementation(project(":feature:topic"))
-    implementation(project(":feature:settings"))
+    implementation(projects.feature.interests)
+    implementation(projects.feature.foryou)
+    implementation(projects.feature.bookmarks)
+    implementation(projects.feature.topic)
+    implementation(projects.feature.search)
+    implementation(projects.feature.settings)
 
-    implementation(project(":core:common"))
-    implementation(project(":core:ui"))
-    implementation(project(":core:designsystem"))
-    implementation(project(":core:data"))
-    implementation(project(":core:model"))
-    implementation(project(":core:analytics"))
+    implementation(projects.core.common)
+    implementation(projects.core.ui)
+    implementation(projects.core.designsystem)
+    implementation(projects.core.data)
+    implementation(projects.core.model)
+    implementation(projects.core.analytics)
 
-    implementation(project(":sync:work"))
+    implementation(projects.sync.work)
 
-    androidTestImplementation(project(":core:testing"))
-    androidTestImplementation(project(":core:datastore-test"))
-    androidTestImplementation(project(":core:data-test"))
-    androidTestImplementation(project(":core:network"))
+    androidTestImplementation(projects.core.testing)
+    androidTestImplementation(projects.core.datastoreTest)
+    androidTestImplementation(projects.core.dataTest)
+    androidTestImplementation(projects.core.network)
     androidTestImplementation(libs.androidx.navigation.testing)
     androidTestImplementation(libs.accompanist.testharness)
     androidTestImplementation(kotlin("test"))
     debugImplementation(libs.androidx.compose.ui.testManifest)
-    debugImplementation(project(":ui-test-hilt-manifest"))
+    debugImplementation(projects.uiTestHiltManifest)
 
-    implementation(libs.accompanist.systemuicontroller)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
@@ -117,15 +121,26 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.window.manager)
     implementation(libs.androidx.profileinstaller)
-
+    implementation(libs.kotlinx.coroutines.guava)
     implementation(libs.coil.kt)
+
+    baselineProfile(project(":benchmarks"))
+
+    // Core functions
+    testImplementation(projects.core.testing)
+    testImplementation(projects.core.datastoreTest)
+    testImplementation(projects.core.dataTest)
+    testImplementation(projects.core.network)
+    testImplementation(libs.androidx.navigation.testing)
+    testImplementation(libs.accompanist.testharness)
+    testImplementation(libs.work.testing)
+    testImplementation(kotlin("test"))
+    kspTest(libs.hilt.compiler)
+
 }
 
-// androidx.test is forcing JUnit, 4.12. This forces it to use 4.13
-configurations.configureEach {
-    resolutionStrategy {
-        force(libs.junit4)
-        // Temporary workaround for https://issuetracker.google.com/174733673
-        force("org.objenesis:objenesis:2.6")
-    }
+baselineProfile {
+    // Don't build on every iteration of a full assemble.
+    // Instead enable generation directly for the release build variant.
+    automaticGenerationDuringBuild = false
 }

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 plugins {
-    id("nowinandroid.android.library")
-    id("nowinandroid.android.library.jacoco")
-    id("nowinandroid.android.hilt")
+    alias(libs.plugins.nowinandroid.android.library)
+    alias(libs.plugins.nowinandroid.android.library.jacoco)
+    alias(libs.plugins.nowinandroid.android.hilt)
     id("kotlinx-serialization")
 }
 
@@ -25,24 +25,24 @@ android {
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
+            isReturnDefaultValues = true
         }
     }
 }
 
 dependencies {
-    implementation(project(":core:common"))
-    implementation(project(":core:model"))
-    implementation(project(":core:database"))
-    implementation(project(":core:datastore"))
-    implementation(project(":core:network"))
-    implementation(project(":core:analytics"))
-
-    testImplementation(project(":core:testing"))
-    testImplementation(project(":core:datastore-test"))
-
+    implementation(projects.core.analytics)
+    implementation(projects.core.common)
+    implementation(projects.core.database)
+    implementation(projects.core.datastore)
+    implementation(projects.core.model)
+    implementation(projects.core.network)
+    implementation(projects.core.notifications)
     implementation(libs.androidx.core.ktx)
-
-    implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.json)
+
+    testImplementation(projects.core.datastoreTest)
+    testImplementation(projects.core.testing)
 }

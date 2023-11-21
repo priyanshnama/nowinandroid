@@ -14,32 +14,33 @@
  * limitations under the License.
  */
 plugins {
-    id("nowinandroid.android.library")
-    id("nowinandroid.android.library.compose")
-    id("nowinandroid.android.library.jacoco")
+    alias(libs.plugins.nowinandroid.android.library)
+    alias(libs.plugins.nowinandroid.android.library.compose)
+    alias(libs.plugins.nowinandroid.android.library.jacoco)
 }
 
 android {
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-    lint {
-        checkDependencies = true
-    }
     namespace = "com.google.samples.apps.nowinandroid.core.designsystem"
 }
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.coil.kt.compose)
+    lintPublish(projects.lint)
+
     api(libs.androidx.compose.foundation)
     api(libs.androidx.compose.foundation.layout)
     api(libs.androidx.compose.material.iconsExtended)
     api(libs.androidx.compose.material3)
-    debugApi(libs.androidx.compose.ui.tooling)
+    api(libs.androidx.compose.runtime)
     api(libs.androidx.compose.ui.tooling.preview)
     api(libs.androidx.compose.ui.util)
-    api(libs.androidx.compose.runtime)
-    lintPublish(project(":lint"))
-    androidTestImplementation(project(":core:testing"))
+
+    debugApi(libs.androidx.compose.ui.tooling)
+
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.coil.kt.compose)
+
+    androidTestImplementation(projects.core.testing)
 }
